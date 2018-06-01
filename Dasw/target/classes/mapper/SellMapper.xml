@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.SellMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Sell" >
+    <id column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="produce_id" property="produceId" jdbcType="INTEGER" />
+    <result column="produce_number" property="produceNumber" jdbcType="INTEGER" />
+    <result column="produce_discount" property="produceDiscount" jdbcType="DOUBLE" />
+    <result column="produce_pay" property="producePay" jdbcType="DOUBLE" />
+  </resultMap>
+  
+  <resultMap id="SellDetailResultMap" type="com.dasw.entity.SellDetail" >
+    <id column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="produce_id" property="produceId" jdbcType="INTEGER" />
+    <result column="produce_number" property="produceNumber" jdbcType="INTEGER" />
+    <result column="produce_discount" property="produceDiscount" jdbcType="DOUBLE" />
+    <result column="produce_pay" property="producePay" jdbcType="DOUBLE" />
+    <result column="produce_name" property="produceName" jdbcType="VARCHAR" />
+    <result column="produce_unit" property="produceUnit" jdbcType="VARCHAR" />
+    <result column="produce_item" property="produceItem" jdbcType="VARCHAR" />
+    <result column="produce_originalPrice" property="produceOriginalprice" jdbcType="DOUBLE" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    order_id, produce_id, produce_number, produce_discount, produce_pay
+  </sql>
+  
+  <select id="findProduceByOrder" resultMap="SellDetailResultMap" parameterType="java.lang.Integer">
+  	select s.order_id,s.produce_id,s.produce_number,produce_discount,produce_pay,produce_name,produce_unit,produce_item,produce_originalPrice
+  	from dasw_produce p inner join dasw_sell s 
+  	on p.produce_id=s.produce_id
+  	where s.order_id=#{orderId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dasw_sell
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dasw_sell
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </delete>
+ 
+  <insert id="insert" parameterType="com.dasw.entity.Sell" >
+    insert into dasw_sell (order_id, produce_id, produce_number, 
+      produce_discount, produce_pay)
+    values (#{orderId,jdbcType=INTEGER}, #{produceId,jdbcType=INTEGER}, #{produceNumber,jdbcType=INTEGER}, 
+      #{produceDiscount,jdbcType=DOUBLE}, #{producePay,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dasw.entity.Sell" >
+    insert into dasw_sell
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="produceId != null" >
+        produce_id,
+      </if>
+      <if test="produceNumber != null" >
+        produce_number,
+      </if>
+      <if test="produceDiscount != null" >
+        produce_discount,
+      </if>
+      <if test="producePay != null" >
+        produce_pay,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="produceId != null" >
+        #{produceId,jdbcType=INTEGER},
+      </if>
+      <if test="produceNumber != null" >
+        #{produceNumber,jdbcType=INTEGER},
+      </if>
+      <if test="produceDiscount != null" >
+        #{produceDiscount,jdbcType=DOUBLE},
+      </if>
+      <if test="producePay != null" >
+        #{producePay,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.dasw.entity.Sell" >
+    update dasw_sell
+    <set >
+      <if test="produceId != null" >
+        produce_id = #{produceId,jdbcType=INTEGER},
+      </if>
+      <if test="produceNumber != null" >
+        produce_number = #{produceNumber,jdbcType=INTEGER},
+      </if>
+      <if test="produceDiscount != null" >
+        produce_discount = #{produceDiscount,jdbcType=DOUBLE},
+      </if>
+      <if test="producePay != null" >
+        produce_pay = #{producePay,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dasw.entity.Sell" >
+    update dasw_sell
+    set produce_id = #{produceId,jdbcType=INTEGER},
+      produce_number = #{produceNumber,jdbcType=INTEGER},
+      produce_discount = #{produceDiscount,jdbcType=DOUBLE},
+      produce_pay = #{producePay,jdbcType=DOUBLE}
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+</mapper>

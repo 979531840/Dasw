@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dasw.dao.SendMapper">
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Send" >
+    <id column="send_id" property="sendId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="send_date" property="sendDate" jdbcType="DATE" />
+    <result column="send_way" property="sendWay" jdbcType="VARCHAR" />
+    <result column="send_courierId" jdbcType="VARCHAR" property="sendCourierid" />
+  </resultMap>
+  
+  <resultMap id="SendDetailResultMap" type="com.dasw.entity.SendDetail" >
+    <id column="send_id" property="sendId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+    <result column="send_date" property="sendDate" jdbcType="DATE" />
+    <result column="send_way" property="sendWay" jdbcType="VARCHAR" />
+    <result column="send_courierId" jdbcType="VARCHAR" property="sendCourierid" />
+  </resultMap>
+  
+  
+  
+  <sql id="Base_Column_List">
+    order_id, send_id, send_date, send_way, send_courierId
+  </sql>
+  
+  <select id="findAll" resultMap="SendDetailResultMap">
+    select send_id, dasw_send.order_id, customer_name, send_date, send_way, send_courierId
+    from dasw_send,dasw_order,dasw_customer 
+    where dasw_send.order_id = dasw_order.order_id and dasw_order.customer_id = dasw_customer.customer_id
+    order by dasw_send.send_id desc
+  </select>
+  
+  <select id="selectSendByPage" resultMap="SendDetailResultMap" parameterType="Map" >
+    select send_id, dasw_send.order_id, customer_name, send_date, send_way, send_courierId
+    from dasw_send,dasw_order,dasw_customer   
+    where dasw_send.order_id = dasw_order.order_id and dasw_order.customer_id = dasw_customer.customer_id
+    
+    <if test="orderId != null">
+	    	and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+	    </if>
+	    <if test="customerName != '' and customerName != null">
+	    	and dasw_customer.customer_name like CONCAT(CONCAT('%', #{customerName,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="sendDate != null and sendDate!='' ">
+	    	and dasw_send.send_date = #{sendDate,jdbcType=DATE}
+	    </if> 
+	    <if test="sendWay != '' and sendWay != null">
+	    	and dasw_send.send_way like CONCAT(CONCAT('%', #{sendWay,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="sendCourierid != '' and sendCourierid != null">
+	    	and dasw_send.send_courierId like CONCAT(CONCAT('%', #{sendCourierid,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    order by dasw_send.send_id desc
+    <if test="start!=null and size!=null">  
+			limit #{start},#{size}  
+     </if>
+  </select>
+  
+  <select id="findLimit" resultMap="SendDetailResultMap" parameterType="SendDetail" >
+    select send_id, dasw_send.order_id, customer_name, send_date, send_way, send_courierId
+    from dasw_send,dasw_order,dasw_customer
+    where dasw_send.order_id = dasw_order.order_id and dasw_order.customer_id = dasw_customer.customer_id
+    <if test="orderId != null">
+	    	and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+	    </if>
+	    <if test="customerName != '' and customerName != null">
+	    	and dasw_customer.customer_name like CONCAT(CONCAT('%', #{customerName,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="sendDate != null and sendDate!='' ">
+	    	and dasw_send.send_date = #{sendDate,jdbcType=DATE}
+	    </if> 
+	    <if test="sendWay != '' and sendWay != null">
+	    	and dasw_send.send_way like CONCAT(CONCAT('%', #{sendWay,jdbcType=VARCHAR}), '%') 
+	    </if>
+  </select>
+  
+  
+  
+  <select id="selectSendPageCount" resultType="Integer">  
+		  select count(*)  from dasw_send,dasw_order,dasw_customer
+    where dasw_send.order_id = dasw_order.order_id and dasw_order.customer_id = dasw_customer.customer_id
+	    <if test="orderId != null">
+	    	and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+	    </if>
+	    <if test="customerName != '' and customerName != null">
+	    	and dasw_customer.customer_name like CONCAT(CONCAT('%', #{customerName,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="sendDate != null">
+	    	and dasw_send.send_date = #{sendDate,jdbcType=DATE}
+	    </if>
+	    <if test="sendWay != '' and sendWay != null">
+	    	and dasw_send.send_way like CONCAT(CONCAT('%', #{sendWay,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="sendCourierid != '' and sendCourierid != null">
+	    	and dasw_send.send_courierId like CONCAT(CONCAT('%', #{sendCourierid,jdbcType=VARCHAR}), '%') 
+	    </if>
+	</select>
+	
+  
+  <select id="findById" resultMap="SendDetailResultMap" parameterType="java.lang.Integer">
+  	select send_id, dasw_send.order_id, customer_name, send_date, send_way, send_courierId
+    from dasw_send,dasw_order,dasw_customer
+    where dasw_send.order_id = dasw_order.order_id and dasw_order.customer_id = dasw_customer.customer_id
+    and send_id = #{sendId,jdbcType=INTEGER}	
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="com.dasw.entity.SendKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from dasw_send
+    where order_id = #{orderId,jdbcType=INTEGER}
+      and send_id = #{sendId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="com.dasw.entity.SendKey">
+    delete from dasw_send
+    where order_id = #{orderId,jdbcType=INTEGER}
+      and send_id = #{sendId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.dasw.entity.Send">
+    insert into dasw_send (order_id, send_id, send_date, 
+      send_way, send_courierId)
+    values (#{orderId,jdbcType=INTEGER}, #{sendId,jdbcType=INTEGER}, #{sendDate,jdbcType=DATE}, 
+      #{sendWay,jdbcType=VARCHAR}, #{sendCourierid,jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.dasw.entity.Send">
+    insert into dasw_send
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="sendId != null">
+        send_id,
+      </if>
+      <if test="sendDate != null">
+        send_date,
+      </if>
+      <if test="sendWay != null">
+        send_way,
+      </if>
+      <if test="sendCourierid != null">
+        send_courierId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="sendId != null">
+        #{sendId,jdbcType=INTEGER},
+      </if>
+      <if test="sendDate != null">
+        #{sendDate,jdbcType=DATE},
+      </if>
+      <if test="sendWay != null">
+        #{sendWay,jdbcType=VARCHAR},
+      </if>
+      <if test="sendCourierid != null">
+        #{sendCourierid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.dasw.entity.Send">
+    update dasw_send
+    <set>
+      <if test="sendDate != null">
+        send_date = #{sendDate,jdbcType=DATE},
+      </if>
+      <if test="sendWay != null">
+        send_way = #{sendWay,jdbcType=VARCHAR},
+      </if>
+      <if test="sendCourierid != null">
+        send_courierId = #{sendCourierid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=INTEGER}
+      and send_id = #{sendId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.dasw.entity.Send">
+    update dasw_send
+    set send_date = #{sendDate,jdbcType=DATE},
+      send_way = #{sendWay,jdbcType=VARCHAR},
+      send_courierId = #{sendCourierid,jdbcType=VARCHAR}
+    where order_id = #{orderId,jdbcType=INTEGER}
+      and send_id = #{sendId,jdbcType=INTEGER}
+  </update>
+
+</mapper>

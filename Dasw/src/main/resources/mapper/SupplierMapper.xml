@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.SupplierMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Supplier" >
+    <id column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="supplier_tel" property="supplierTel" jdbcType="VARCHAR" />
+    <result column="supplier_company" property="supplierCompany" jdbcType="VARCHAR" />
+    <result column="supplier_address" property="supplierAddress" jdbcType="VARCHAR" />
+    <result column="supplier_phone" property="supplierPhone" jdbcType="VARCHAR" />
+    <result column="supplier_qq" property="supplierQq" jdbcType="VARCHAR" />
+    <result column="supplier_email" property="supplierEmail" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    supplier_id, supplier_name, supplier_tel, supplier_company, supplier_address, supplier_phone, 
+    supplier_qq, supplier_email
+  </sql>
+  
+  
+  <sql id="Select_Where">
+  		<where>
+		 	    <if test="supplierName!=null  and !&quot;&quot;.equals(supplierName.trim())">
+			        	supplier_name LIKE '%' #{supplierName} '%'
+			     </if>
+		      <if test="supplierCompany!=null and !&quot;&quot;.equals(supplierCompany.trim())" >
+		        AND supplier_company LIKE '%' #{supplierCompany} '%'
+		      </if>
+		 </where>
+  		
+  </sql>
+	<!-- 条件分页查询开始 -->
+						<!-- 条件分页查询 -->
+						<select id="selectSupplierByPage"  parameterType="Map"   resultMap="BaseResultMap">  
+							  select   
+							    <include refid="Base_Column_List" />
+							  from dasw_supplier    
+							<include refid="Select_Where" />
+							order by supplier_id desc
+							<if test="start!=null and size!=null">  
+						        limit #{start},#{size}  
+						    </if>
+				  			 <!-- limit #{start},#{size}   -->
+						</select>  
+						
+						
+						<!-- 取得记录的总数 -->  
+						<select id="selectSupplierPageCount" resultType="Integer"  parameterType="com.dasw.entity.Customer">  
+							  select count(*) from  dasw_supplier  
+							  <include refid="Select_Where" />
+						</select> 
+	<!--   条件分页查询结束 -->
+  
+  <select id="findAll" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  		select <include refid="Base_Column_List" />  from  dasw_supplier order by supplier_id desc
+  </select>
+ <select id="findSupplierByName"  resultMap="BaseResultMap" parameterType="String" >
+ 		select <include refid="Base_Column_List" />   from dasw_supplier where supplier_name=#{supplierName,jdbcType=VARCHAR}
+   </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dasw_supplier
+    where supplier_id = #{supplierId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dasw_supplier
+    where supplier_id = #{supplierId,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.dasw.entity.Supplier" >
+    insert into dasw_supplier (supplier_id, supplier_name, supplier_tel, 
+      supplier_company, supplier_address, supplier_phone, 
+      supplier_qq, supplier_email)
+    values (#{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{supplierTel,jdbcType=VARCHAR}, 
+      #{supplierCompany,jdbcType=VARCHAR}, #{supplierAddress,jdbcType=VARCHAR}, #{supplierPhone,jdbcType=VARCHAR}, 
+      #{supplierQq,jdbcType=VARCHAR}, #{supplierEmail,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dasw.entity.Supplier" >
+    insert into dasw_supplier
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="supplierTel != null" >
+        supplier_tel,
+      </if>
+      <if test="supplierCompany != null" >
+        supplier_company,
+      </if>
+      <if test="supplierAddress != null" >
+        supplier_address,
+      </if>
+      <if test="supplierPhone != null" >
+        supplier_phone,
+      </if>
+      <if test="supplierQq != null" >
+        supplier_qq,
+      </if>
+      <if test="supplierEmail != null" >
+        supplier_email,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierTel != null" >
+        #{supplierTel,jdbcType=INTEGER},
+      </if>
+      <if test="supplierCompany != null" >
+        #{supplierCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierAddress != null" >
+        #{supplierAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierPhone != null" >
+        #{supplierPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierQq != null" >
+        #{supplierQq,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierEmail != null" >
+        #{supplierEmail,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.dasw.entity.Supplier" >
+    update dasw_supplier
+    <set >
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierTel != null" >
+        supplier_tel = #{supplierTel,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierCompany != null" >
+        supplier_company = #{supplierCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierAddress != null" >
+        supplier_address = #{supplierAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierPhone != null" >
+        supplier_phone = #{supplierPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierQq != null" >
+        supplier_qq = #{supplierQq,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierEmail != null" >
+        supplier_email = #{supplierEmail,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where supplier_id = #{supplierId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dasw.entity.Supplier" >
+    update dasw_supplier
+    set supplier_name = #{supplierName,jdbcType=VARCHAR},
+      supplier_tel = #{supplierTel,jdbcType=VARCHAR},
+      supplier_company = #{supplierCompany,jdbcType=VARCHAR},
+      supplier_address = #{supplierAddress,jdbcType=VARCHAR},
+      supplier_phone = #{supplierPhone,jdbcType=VARCHAR},
+      supplier_qq = #{supplierQq,jdbcType=VARCHAR},
+      supplier_email = #{supplierEmail,jdbcType=VARCHAR}
+    where supplier_id = #{supplierId,jdbcType=INTEGER}
+  </update>
+</mapper>

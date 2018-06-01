@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.ProduceMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Produce" >
+    <id column="produce_id" property="produceId" jdbcType="INTEGER" />
+    <result column="produce_name" property="produceName" jdbcType="VARCHAR" />
+    <result column="produce_typename" property="produceTypename" jdbcType="VARCHAR" />
+    <result column="produce_item" property="produceItem" jdbcType="VARCHAR" />
+    <result column="produce_specification" property="produceSpecification" jdbcType="VARCHAR" />
+    <result column="produce_unit" property="produceUnit" jdbcType="VARCHAR" />
+    <result column="produce_number" property="produceNumber" jdbcType="DECIMAL" />
+    <result column="produce_purchaseDate" property="producePurchasedate" jdbcType="DATE" />
+    <result column="produce_originalPrice" property="produceOriginalprice" jdbcType="DOUBLE" />
+    <result column="roduce_discount" property="roduceDiscount" jdbcType="DOUBLE" />
+    <result column="produce_adddate" property="produceAdddate" jdbcType="DATE" />
+    <result column="produce_date" property="produceDate" jdbcType="DATE" />
+    <result column="produce_batch" property="produceBatch" jdbcType="VARCHAR" />
+    <result column="produce_content" property="produceContent" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    produce_id, produce_name, produce_typename, produce_item, produce_specification, 
+    produce_unit, produce_number, produce_purchaseDate, produce_originalPrice, roduce_discount, 
+    produce_adddate, produce_date, produce_batch, produce_content
+  </sql>
+  
+  <sql id="Base_List" >
+    produce_id,produce_name,produce_item,produce_typename,produce_specification, 
+    produce_unit,produce_originalPrice,produce_number
+  </sql>
+  
+  <select id="findAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_List" />
+    from dasw_produce
+  </select>
+  
+  <!-- 组合条件查询 -->
+  <select id="getProduceList" resultMap="BaseResultMap"  parameterType="com.dasw.entity.Produce">
+    select
+    <include refid="Base_List" />
+    from dasw_produce p 
+    <where>
+    <if test="produceName!=null and !&quot;&quot;.equals(produceName.trim())">
+        p.produce_name LIKE '%' #{produceName} '%'
+     </if>
+      <if test="produceItem!=null and !&quot;&quot;.equals(produceItem.trim())" >
+        AND p.produce_item LIKE '%' #{produceItem} '%'
+      </if>
+      <if test="produceTypename!=null and !&quot;&quot;.equals(produceTypename.trim())" >
+        AND p.produce_typename = #{produceTypename}
+      </if>
+      </where>
+      order by p.produce_id desc
+  </select>
+  
+  <select id="findByID" resultMap="BaseResultMap" parameterType="Integer" >
+    select *
+    from dasw_produce
+    where produce_id = #{produceId}
+  </select>
+  
+  <select id="findProduceByName" resultMap="BaseResultMap" parameterType="String" >
+    select 
+    p.*
+    from dasw_produce p
+   where p.produce_name = #{produceName}
+   
+   
+  </select>
+  
+  <select id="findProduceByOrder" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  	select
+  	p.*
+  	from dasw_produce p inner join dasw_sell s 
+  	on p.produce_id=s.produce_id
+  	where s.order_id=#{orderId,jdbcType=INTEGER}
+  </select>
+  
+  <insert id="addProduce" parameterType="com.dasw.entity.Produce">
+	  insert into dasw_produce (
+	  produce_name,produce_item,produce_specification,produce_unit,produce_number,
+	  produce_typename,
+	  produce_purchaseDate,
+	  produce_originalPrice,
+	  roduce_discount,
+	  produce_adddate,
+      produce_date,
+      produce_batch)
+      values (#{produceName},#{produceItem},#{produceSpecification},#{produceUnit},#{produceNumber},
+      #{produceTypename},
+      str_to_date(#{producePurchasedate},'%Y-%m-%d'),
+      #{produceOriginalprice},
+      #{roduceDiscount},
+      str_to_date(#{produceAdddate},'%Y-%m-%d'),
+      str_to_date(#{produceDate},'%Y-%m-%d'),
+	  #{produceBatch})
+	</insert>
+	
+	<delete id="delete" parameterType="java.lang.Integer" >
+    delete from dasw_produce
+    where produce_id = #{produceId,jdbcType=INTEGER}
+    </delete>
+    
+    <update id="update" parameterType="com.dasw.entity.Produce" >
+    update dasw_produce
+    <set>
+    <if test="produceName != null" >
+      produce_name = #{produceName},
+      </if>
+      <if test="produceTypename != null" >
+      produce_typename = #{produceTypename},
+      </if>
+      <if test="produceItem != null" >
+      produce_item = #{produceItem},
+      </if>
+      <if test="produceSpecification != null" >
+      produce_specification = #{produceSpecification},
+      </if>
+      <if test="produceUnit != null" >
+      produce_unit = #{produceUnit},
+      </if>
+      <if test="produceNumber != null" >
+      produce_number = #{produceNumber},
+      </if>
+      <if test="producePurchasedate != null" >
+      produce_purchaseDate = str_to_date(#{producePurchasedate},'%Y-%m-%d'),
+      </if>
+      <if test="produceOriginalprice != null" >
+      produce_originalPrice = #{produceOriginalprice},
+      </if>
+      <if test="roduceDiscount != null" >
+      roduce_discount = #{roduceDiscount},
+      </if>
+      <if test="produceAdddate != null" >
+      produce_adddate = str_to_date(#{produceAdddate},'%Y-%m-%d'),
+      </if>
+      <if test="produceDate != null" >
+      produce_date = str_to_date(#{produceDate},'%Y-%m-%d'),
+      </if>
+      <if test="produceBatch != null" >
+      produce_batch = #{produceBatch},
+      </if>
+    </set>
+    where produce_id = #{produceId}
+  </update>
+  
+  <!-- 分页查询所有产品  返回数据集-->
+  <select id="selectProduceByPage" parameterType="Map" resultMap="BaseResultMap">
+  	select * from dasw_produce p 
+  	<where>
+    <if test="produceName!=null and !&quot;&quot;.equals(produceName.trim())">
+        p.produce_name LIKE '%' #{produceName} '%'
+     </if>
+      <if test="produceItem!=null and !&quot;&quot;.equals(produceItem.trim())" >
+        AND p.produce_item LIKE '%' #{produceItem} '%'
+      </if>
+      <if test="produceTypename!=null and !&quot;&quot;.equals(produceTypename.trim())" >
+        AND p.produce_typename = #{produceTypename}
+      </if>
+      </where>
+      order by p.produce_id desc
+  	<if test="start!=null and size!=null">
+  		limit #{start},#{size}
+  	</if>
+  </select>
+  
+  <!-- 分页查询  返回查询总记录数-->
+  <select id="selectProducePageCount"  resultType="Integer"  parameterType="com.dasw.entity.Produce">
+  	select count(1) from dasw_produce p
+  	<where>
+    <if test="produceName!=null and !&quot;&quot;.equals(produceName.trim())">
+        p.produce_name LIKE '%' #{produceName} '%'
+     </if>
+      <if test="produceItem!=null and !&quot;&quot;.equals(produceItem.trim())" >
+        AND p.produce_item LIKE '%' #{produceItem} '%'
+      </if>
+      <if test="produceTypename!=null and !&quot;&quot;.equals(produceTypename.trim())" >
+        AND p.produce_typename = #{produceTypename}
+      </if>
+      </where>
+  </select>
+  
+</mapper>

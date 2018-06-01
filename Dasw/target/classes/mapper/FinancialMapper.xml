@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.FinancialMapper" >
+
+  <resultMap  id="BaseResultMap"  type="com.dasw.entity.Financial">
+  	<result property="orderId" column="order_id"/>
+  	<result property="orderTotalprice" column="order_totalprice"/>
+  	<result property="orderPay" column="order_pay"/>
+  	<result property="orderDate" column="order_date"/>
+  	<!-- 多对一客户名称 -->
+  	<association property="customer"  resultMap="customerMap"/>
+  	<!-- 一对多产品名称 -->
+  	<collection property="produceList" ofType="com.dasw.entity.Produce">  
+        <id property="produceId" column="produce_id" />  
+        <result property="produceName" column="produce_name" />
+    </collection> 
+  </resultMap>
+  
+    <resultMap id="customerMap" type="com.dasw.entity.Customer">  
+        <id property="customerId" column="customer_id" />  
+        <result property="customerName" column="customer_name" />
+    </resultMap> 
+  
+  <select id="findAll" resultMap="BaseResultMap">
+  	select
+  		o.order_id,o.order_totalprice,o.order_pay,o.order_date,c.customer_id,c.customer_name,p.produce_id,p.produce_name
+  	from
+  		dasw_order o LEFT OUTER JOIN dasw_customer c on o.customer_id=c.customer_id
+  		INNER JOIN dasw_sell s USING(order_id)
+  		LEFT OUTER JOIN dasw_produce p USING(produce_id)
+  		
+  		order by o.order_id desc
+  </select>
+  
+  <select id="findByQuery" resultMap="BaseResultMap"  parameterType="Map">
+  	select
+  		o.order_id,o.order_totalprice,o.order_pay,o.order_date,c.customer_id,c.customer_name,p.produce_id,p.produce_name
+  	from
+  		dasw_order o LEFT OUTER JOIN dasw_customer c on o.customer_id=c.customer_id
+  		INNER JOIN dasw_sell s USING(order_id)
+  		LEFT OUTER JOIN dasw_produce p USING(produce_id)
+  	<where>
+  		1=1
+	    <if test="orderId!=null and !&quot;&quot;.equals(orderId.trim())">
+	        AND o.order_id LIKE '%' #{orderId} '%'
+	     </if>
+	      <if test="customerName!=null and !&quot;&quot;.equals(customerName.trim())" >
+	        AND c.customer_name LIKE '%' #{customerName} '%'
+	      </if>
+	      <if test="isPay=未付" >
+	        AND o.order_pay =0
+	      </if>
+	      <if test="isPay=已付" >
+	        AND o.order_pay != 0
+	      </if>
+	      <if test="startDate!=null and !&quot;&quot;.equals(startDate.trim()) and endDate!=null and !&quot;&quot;.equals(endDate.trim())" >
+	        AND o.order_date between str_to_date(#{startDate},'%Y-%m-%d') and str_to_date(#{endDate},'%Y-%m-%d')   
+	      </if>
+    </where>
+  </select>
+  
+  <!-- 分页查询所有记录  返回数据集-->
+  <select id="selectFinancialByPage" parameterType="Map" resultMap="BaseResultMap">
+  	select
+  		o.order_id,o.order_totalprice,o.order_pay,o.order_date,c.customer_id,c.customer_name,p.produce_id,p.produce_name
+  	from
+  		dasw_order o LEFT OUTER JOIN dasw_customer c on o.customer_id=c.customer_id
+  		INNER JOIN dasw_sell s USING(order_id)
+  		LEFT OUTER JOIN dasw_produce p USING(produce_id)
+  	<where>
+  		1=1
+	    <if test="orderId!=null and !&quot;&quot;.equals(orderId.trim())">
+	        AND o.order_id LIKE '%' #{orderId} '%'
+	     </if>
+	      <if test="customerName!=null and !&quot;&quot;.equals(customerName.trim())" >
+	        AND c.customer_name LIKE '%' #{customerName} '%'
+	      </if>
+	      <if test="isPay!=null and !&quot;&quot;.equals(isPay.trim()) and &quot;0&quot;.equals(isPay.trim())" >
+	        AND o.order_pay =0
+	      </if>
+	      <if test="isPay!=null and !&quot;&quot;.equals(isPay.trim()) and &quot;1&quot;.equals(isPay.trim())" >
+	        AND o.order_pay != 0
+	      </if>
+	      <if test="startDate!=null and !&quot;&quot;.equals(startDate.trim())" >
+	        AND o.order_date &gt;= str_to_date(#{startDate},'%Y-%m-%d')  
+	      </if>
+	      <if test="endDate!=null and !&quot;&quot;.equals(endDate.trim())" >
+	        AND o.order_date &lt;= str_to_date(#{endDate},'%Y-%m-%d')   
+	      </if>
+    </where>
+  	<if test="start!=null and size!=null">
+  		limit #{start},#{size}
+  	</if>
+  </select>
+  
+  <!-- 分页查询  返回查询总记录数-->
+  <select id="selectFinancialPageCount"  resultType="Integer"  parameterType="Map">
+    select count(distinct o.order_id)
+  	from
+  		dasw_order o LEFT OUTER JOIN dasw_customer c on o.customer_id=c.customer_id
+  		INNER JOIN dasw_sell s USING(order_id)
+  		LEFT OUTER JOIN dasw_produce p USING(produce_id)
+  	<where>
+  	     1=1
+	    <if test="orderId!=null and !&quot;&quot;.equals(orderId.trim())">
+	        AND o.order_id LIKE '%' #{orderId} '%'
+	     </if>
+	      <if test="customerName!=null and !&quot;&quot;.equals(customerName.trim())" >
+	        AND c.customer_name LIKE '%' #{customerName} '%'
+	      </if>
+	      <if test="isPay!=null and !&quot;&quot;.equals(isPay.trim()) and &quot;0&quot;.equals(isPay.trim())" >
+	        AND o.order_pay =0
+	      </if>
+	      <if test="isPay!=null and !&quot;&quot;.equals(isPay.trim()) and &quot;1&quot;.equals(isPay.trim())" >
+	        AND o.order_pay !=0
+	      </if>
+	      <if test="startDate!=null and !&quot;&quot;.equals(startDate.trim()) and endDate!=null and !&quot;&quot;.equals(endDate.trim())" >
+	        AND o.order_date between str_to_date(#{startDate},'%Y-%m-%d') and str_to_date(#{endDate},'%Y-%m-%d')   
+	      </if>
+    </where>
+  </select>
+</mapper>

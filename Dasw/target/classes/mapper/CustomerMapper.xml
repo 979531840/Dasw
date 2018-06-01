@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.CustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Customer" >
+    <id column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="customer_type" property="customerType" jdbcType="VARCHAR" />
+    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+    <result column="customer_tel" property="customerTel" jdbcType="VARCHAR" />
+    <result column="customer_company_name" property="customerCompanyName" jdbcType="VARCHAR" />
+    <result column="customer_company_address" property="customerCompanyAddress" jdbcType="VARCHAR" />
+    <result column="customer_company_tel" property="customerCompanyTel" jdbcType="VARCHAR" />
+    <result column="customer_receiver_name" property="customerReceiverName" jdbcType="VARCHAR" />
+    <result column="customer_receiver_tel" property="customerReceiverTel" jdbcType="VARCHAR" />
+    <result column="customer_receiver_address" property="customerReceiverAddress" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    customer_id, user_id, customer_type, customer_name, customer_tel, customer_company_name, 
+    customer_company_address, customer_company_tel, customer_receiver_name, customer_receiver_tel, 
+    customer_receiver_address
+  </sql>
+  
+    <sql id="Select_Where">
+  		<where>
+		 	    <if test="customerName and !&quot;&quot;.equals(customerName.trim())">
+			        	customer_name LIKE '%' #{customerName} '%'
+			     </if>
+		      <if test="customerCompanyName!=null and !&quot;&quot;.equals(customerCompanyName.trim())" >
+		        AND customer_company_name LIKE '%' #{customerCompanyName} '%'
+		      </if>
+		 </where>
+  		
+  </sql>
+	<!-- 条件分页查询开始 -->
+						<!-- 条件分页查询 -->
+						<select id="selectCustomerByPage"  parameterType="Map"   resultMap="BaseResultMap">  
+							  select   
+							    <include refid="Base_Column_List" />
+							  from dasw_customer   
+							<include refid="Select_Where" />
+							 order by customer_id desc
+							<if test="start!=null and size!=null">  
+						        limit #{start},#{size}  
+						    </if>
+				  			 <!-- limit #{start},#{size}   -->
+						</select>  
+						
+						
+						<!-- 取得记录的总数 -->  
+						<select id="selectCustomerPageCount" resultType="Integer"  parameterType="com.dasw.entity.Customer">  
+							  select count(*) from  dasw_customer  
+							  <include refid="Select_Where" />
+						</select> 
+	<!--   条件分页查询结束 -->
+	
+  
+  
+   <select id="findAll" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+ 		select <include refid="Base_Column_List" />   from dasw_customer order by customer_id desc
+   </select>
+ 
+ <select id="findCustomerByName"  resultMap="BaseResultMap" parameterType="String" >
+ 		select <include refid="Base_Column_List" />   from dasw_customer where  customer_name = #{customerName,jdbcType=VARCHAR}
+   </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dasw_customer
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dasw_customer
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.dasw.entity.Customer" >
+    insert into dasw_customer (customer_id, user_id, customer_type, 
+      customer_name, customer_tel, customer_company_name, 
+      customer_company_address, customer_company_tel, 
+      customer_receiver_name, customer_receiver_tel, 
+      customer_receiver_address)
+    values (#{customerId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{customerType,jdbcType=VARCHAR}, 
+      #{customerName,jdbcType=VARCHAR}, #{customerTel,jdbcType=VARCHAR}, #{customerCompanyName,jdbcType=VARCHAR}, 
+      #{customerCompanyAddress,jdbcType=VARCHAR}, #{customerCompanyTel,jdbcType=VARCHAR}, 
+      #{customerReceiverName,jdbcType=VARCHAR}, #{customerReceiverTel,jdbcType=VARCHAR}, 
+      #{customerReceiverAddress,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dasw.entity.Customer" >
+    insert into dasw_customer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="customerType != null" >
+        customer_type,
+      </if>
+      <if test="customerName != null" >
+        customer_name,
+      </if>
+      <if test="customerTel != null" >
+        customer_tel,
+      </if>
+      <if test="customerCompanyName != null" >
+        customer_company_name,
+      </if>
+      <if test="customerCompanyAddress != null" >
+        customer_company_address,
+      </if>
+      <if test="customerCompanyTel != null" >
+        customer_company_tel,
+      </if>
+      <if test="customerReceiverName != null" >
+        customer_receiver_name,
+      </if>
+      <if test="customerReceiverTel != null" >
+        customer_receiver_tel,
+      </if>
+      <if test="customerReceiverAddress != null" >
+        customer_receiver_address,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="customerId != null" >
+        #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="customerType != null" >
+        #{customerType,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null" >
+        #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerTel != null" >
+        #{customerTel,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCompanyName != null" >
+        #{customerCompanyName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCompanyAddress != null" >
+        #{customerCompanyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCompanyTel != null" >
+        #{customerCompanyTel,jdbcType=VARCHAR},
+      </if>
+      <if test="customerReceiverName != null" >
+        #{customerReceiverName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerReceiverTel != null" >
+        #{customerReceiverTel,jdbcType=VARCHAR},
+      </if>
+      <if test="customerReceiverAddress != null" >
+        #{customerReceiverAddress,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+ 
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.dasw.entity.Customer" >
+    update dasw_customer
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="customerType != null" >
+        customer_type = #{customerType,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null" >
+        customer_name = #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerTel != null" >
+        customer_tel = #{customerTel,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCompanyName != null" >
+        customer_company_name = #{customerCompanyName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCompanyAddress != null" >
+        customer_company_address = #{customerCompanyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCompanyTel != null" >
+        customer_company_tel = #{customerCompanyTel,jdbcType=VARCHAR},
+      </if>
+      <if test="customerReceiverName != null" >
+        customer_receiver_name = #{customerReceiverName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerReceiverTel != null" >
+        customer_receiver_tel = #{customerReceiverTel,jdbcType=VARCHAR},
+      </if>
+      <if test="customerReceiverAddress != null" >
+        customer_receiver_address = #{customerReceiverAddress,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dasw.entity.Customer" >
+    update dasw_customer
+    set user_id = #{userId,jdbcType=INTEGER},
+      customer_type = #{customerType,jdbcType=VARCHAR},
+      customer_name = #{customerName,jdbcType=VARCHAR},
+      customer_tel = #{customerTel,jdbcType=VARCHAR},
+      customer_company_name = #{customerCompanyName,jdbcType=VARCHAR},
+      customer_company_address = #{customerCompanyAddress,jdbcType=VARCHAR},
+      customer_company_tel = #{customerCompanyTel,jdbcType=VARCHAR},
+      customer_receiver_name = #{customerReceiverName,jdbcType=VARCHAR},
+      customer_receiver_tel = #{customerReceiverTel,jdbcType=VARCHAR},
+      customer_receiver_address = #{customerReceiverAddress,jdbcType=VARCHAR}
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+</mapper>

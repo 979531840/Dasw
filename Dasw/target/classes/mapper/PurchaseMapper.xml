@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.PurchaseMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Purchase" >
+    <id column="purchase_id" property="purchaseId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="stock_product_id" property="stockProductId" jdbcType="INTEGER" />
+    <result column="supplier_number" property="supplierNumber" jdbcType="INTEGER" />
+    <result column="supplier_price" property="supplierPrice" jdbcType="DOUBLE" />
+    <result column="purchase_date"  property="purchaseDate" jdbcType="DATE"/>  
+    <result column="supplier_batch" property="supplierBatch" jdbcType="VARCHAR" />
+    <result column="supplier_money" property="supplierMoney" jdbcType="DOUBLE" />
+    <result column="supplier_rate" property="supplierRate" jdbcType="DOUBLE" />
+    <result column="supplier_ratemoney" property="supplierRatemoney" jdbcType="DOUBLE" />
+  </resultMap>
+  
+  <resultMap id="PurchaseDetailResultMap" type="com.dasw.entity.PurchaseDetail" >
+    <id column="purchase_id" property="purchaseId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="stock_product_id" property="stockProductId" jdbcType="INTEGER" />
+    <result column="produce_name" property="produceName" jdbcType="VARCHAR" />
+    <result column="produce_item" property="produceItem" jdbcType="VARCHAR" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="purchase_date" property="purchaseDate" jdbcType="DATE" />
+    <result column="supplier_number" property="supplierNumber" jdbcType="INTEGER" />
+    <result column="supplier_price" property="supplierPrice" jdbcType="DOUBLE" />
+    <result column="supplier_batch" property="supplierBatch" jdbcType="VARCHAR" />
+    <result column="supplier_money" property="supplierMoney" jdbcType="DOUBLE" />
+    <result column="supplier_rate" property="supplierRate" jdbcType="DOUBLE" />
+    <result column="supplier_ratemoney" property="supplierRatemoney" jdbcType="DOUBLE" />
+    <result column="produce_unit" property="produceUnit" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    purchase_id, supplier_id, stock_product_id, supplier_number, supplier_price, purchase_date, supplier_batch, 
+    supplier_money, supplier_rate, supplier_ratemoney
+  </sql>
+  
+  <select id="findAll" resultMap="PurchaseDetailResultMap">
+    select purchase_id, dasw_purchase.supplier_id, stock_product_id, produce_name, produce_item, supplier_name, purchase_date, supplier_number, 
+    supplier_price, supplier_batch, supplier_money, supplier_rate, supplier_ratemoney, produce_unit
+    from dasw_purchase,dasw_supplier,dasw_produce
+    where dasw_purchase.stock_product_id = dasw_produce.produce_id and dasw_supplier.supplier_id = dasw_purchase.supplier_id
+    order by dasw_purchase.purchase_id  desc
+  </select>
+  
+  <select id="selectPurchaseByPage" resultMap="PurchaseDetailResultMap" parameterType="Map" >
+    select purchase_id, dasw_purchase.supplier_id, stock_product_id, produce_name, produce_item, supplier_name, purchase_date, supplier_number, 
+    supplier_price, supplier_batch, supplier_money, supplier_rate, supplier_ratemoney, produce_unit
+    from dasw_purchase,dasw_supplier,dasw_produce  
+    where dasw_purchase.stock_product_id = dasw_produce.produce_id and dasw_supplier.supplier_id = dasw_purchase.supplier_id
+    <if test="stockProductId != null">
+    	and dasw_purchase.stock_product_id = #{stockProductId,jdbcType=INTEGER}
+    </if>
+    <if test="produceName != '' and produceName != null">
+    	and dasw_produce.produce_name like CONCAT(CONCAT('%', #{produceName,jdbcType=VARCHAR}), '%') 
+    </if>
+    <if test="supplierName != '' and supplierName != null">
+    	and dasw_supplier.supplier_name like CONCAT(CONCAT('%', #{supplierName,jdbcType=VARCHAR}), '%') 
+    </if>
+    <if test="purchaseDate != null">
+    	and dasw_purchase.purchase_date = #{purchaseDate,jdbcType=DATE}
+    </if>  
+    order by dasw_purchase.purchase_id  desc
+    <if test="start!=null and size!=null">  
+			limit #{start},#{size}  
+     </if>
+  </select>
+  
+  <select id="selectPurchasePageCount" resultType="Integer">  
+		  select count(*) from dasw_purchase,dasw_supplier,dasw_produce
+    where dasw_purchase.stock_product_id = dasw_produce.produce_id and dasw_supplier.supplier_id = dasw_purchase.supplier_id
+	    <if test="stockProductId != null">
+	    	and dasw_purchase.stock_product_id = #{stockProductId,jdbcType=INTEGER}
+	    </if>
+	    <if test="produceName != '' and produceName != null">
+	    	and dasw_produce.produce_name like CONCAT(CONCAT('%', #{produceName,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="supplierName != '' and supplierName != null">
+	    	and dasw_supplier.supplier_name like CONCAT(CONCAT('%', #{supplierName,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="purchaseDate != null">
+	    	and dasw_purchase.purchase_date = #{purchaseDate,jdbcType=DATE}
+	    </if>  
+	</select> 
+  
+  <select id="findById" resultMap="PurchaseDetailResultMap" parameterType="java.lang.Integer">
+  	select purchase_id, dasw_purchase.supplier_id, stock_product_id, produce_name, produce_item, supplier_name, purchase_date, supplier_number, 
+    supplier_price, supplier_batch, supplier_money, supplier_rate, supplier_ratemoney, produce_unit
+    from dasw_purchase,dasw_supplier,dasw_produce
+    where dasw_purchase.stock_product_id = dasw_produce.produce_id and dasw_supplier.supplier_id = dasw_purchase.supplier_id
+    and purchase_id = #{purchaseId,jdbcType=INTEGER}	
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dasw_purchase
+    where purchase_id = #{purchaseId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dasw_purchase
+    where purchase_id = #{purchaseId,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.dasw.entity.Purchase" >
+    insert into dasw_purchase (purchase_id, supplier_id, stock_product_id, 
+      supplier_number, supplier_price, purchase_date, supplier_batch, 
+      supplier_money, supplier_rate, supplier_ratemoney
+      )
+    values (#{purchaseId,jdbcType=INTEGER}, #{supplierId,jdbcType=INTEGER}, #{stockProductId,jdbcType=INTEGER}, 
+      #{supplierNumber,jdbcType=INTEGER}, #{supplierPrice,jdbcType=DOUBLE}, #{purchaseDate,jdbcType=DATE}, #{supplierBatch,jdbcType=VARCHAR}, 
+      #{supplierMoney,jdbcType=DOUBLE}, #{supplierRate,jdbcType=DOUBLE}, #{supplierRatemoney,jdbcType=DOUBLE}
+      )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.dasw.entity.Purchase" >
+    insert into dasw_purchase
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="purchaseId != null" >
+        purchase_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="stockProductId != null" >
+        stock_product_id,
+      </if>
+      <if test="supplierNumber != null" >
+        supplier_number,
+      </if>
+      <if test="supplierPrice != null" >
+        supplier_price,
+      </if>
+      <if test="purchaseDate != null" >
+        purchase_date,
+      </if>
+      <if test="supplierBatch != null" >
+        supplier_batch,
+      </if>
+      <if test="supplierMoney != null" >
+        supplier_money,
+      </if>
+      <if test="supplierRate != null" >
+        supplier_rate,
+      </if>
+      <if test="supplierRatemoney != null" >
+        supplier_ratemoney,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="purchaseId != null" >
+        #{purchaseId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="stockProductId != null" >
+        #{stockProductId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierNumber != null" >
+        #{supplierNumber,jdbcType=INTEGER},
+      </if>
+      <if test="supplierPrice != null" >
+        #{supplierPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="purchaseDate != null" >
+        #{purchaseDate,jdbcType=DATE},
+      </if>
+      <if test="supplierBatch != null" >
+        #{supplierBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierMoney != null" >
+        #{supplierMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="supplierRate != null" >
+        #{supplierRate,jdbcType=DOUBLE},
+      </if>
+      <if test="supplierRatemoney != null" >
+        #{supplierRatemoney,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.dasw.entity.Purchase" >
+    update dasw_purchase
+    <set >
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="stockProductId != null" >
+        stock_product_id = #{stockProductId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierNumber != null" >
+        supplier_number = #{supplierNumber,jdbcType=INTEGER},
+      </if>
+      <if test="supplierPrice != null" >
+        supplier_price = #{supplierPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="purchaseDate != null" >
+        purchase_date = #{purchaseDate,jdbcType=DATE},
+      </if>
+      <if test="supplierBatch != null" >
+        supplier_batch = #{supplierBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierMoney != null" >
+        supplier_money = #{supplierMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="supplierRate != null" >
+        supplier_rate = #{supplierRate,jdbcType=DOUBLE},
+      </if>
+      <if test="supplierRatemoney != null" >
+        supplier_ratemoney = #{supplierRatemoney,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where purchase_id = #{purchaseId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.dasw.entity.Purchase" >
+    update dasw_purchase
+    set supplier_id = #{supplierId,jdbcType=INTEGER},
+      stock_product_id = #{stockProductId,jdbcType=INTEGER},
+      supplier_number = #{supplierNumber,jdbcType=INTEGER},
+      supplier_price = #{supplierPrice,jdbcType=DOUBLE},
+      purchase_date = #{purchaseDate,jdbcType=DATE},
+      supplier_batch = #{supplierBatch,jdbcType=VARCHAR},
+      supplier_money = #{supplierMoney,jdbcType=DOUBLE},
+      supplier_rate = #{supplierRate,jdbcType=DOUBLE},
+      supplier_ratemoney = #{supplierRatemoney,jdbcType=DOUBLE}
+    where purchase_id = #{purchaseId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+<!--
+	<properties resource="conn.properties" />
+	  -->
+	  
+	 <classPathEntry location="E:\software\mysql-connector-java-5.1.26-bin.jar"/>
+	<!-- 指定运行环境是mybatis3的版本 -->
+	<context id="testTables" targetRuntime="MyBatis3">
+
+		<commentGenerator>
+		<!-- 是否取消注释 -->
+			<property name="suppressAllComments" value="true" />
+			 <!-- 是否生成注释代时间戳 -->
+			<property name="suppressDate" value="true" />
+		</commentGenerator>
+		<!-- 处理2   jdbc 连接信息 -->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://localhost:3306/dasw?useUnicode=true&amp;characterEncoding=UTF-8" userId="root" password="root">
+		</jdbcConnection>
+		
+        <!--处理3   targetPackage指定模型在生成在哪个包 ,targetProject指定项目的src,-->        
+		<javaModelGenerator targetPackage="com.dasw.entity"  
+			targetProject="Dasw/src/main/java">
+			<!-- 去除字段前后空格 -->
+			<property name="trimStrings" value="false" />
+		</javaModelGenerator>
+		<!--处理4   配置SQL映射文件生成信息 -->  
+		<!--targetPackage="com.dasw.dao"  -->
+		<sqlMapGenerator	targetProject="Dasw/src/main/resources"  targetPackage="mapper"/>  
+		<!-- 处理5   配置dao接口生成信息-->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.dasw.dao" targetProject="Dasw/src/main/java" />
+
+		<table tableName="dasw_customer" domainObjectName="Customer"/>
+		<table tableName="dasw_invoice" domainObjectName="Invoice"/>
+		<table tableName="dasw_order" domainObjectName="Order"/>
+		<table tableName="dasw_produce" domainObjectName="Produce"/>
+		<table tableName="dasw_purchase" domainObjectName="Purchase"/>
+		<table tableName="dasw_sell" domainObjectName="Sell"/>
+		<table tableName="dasw_send" domainObjectName="Send"/>
+		<table tableName="dasw_supplier" domainObjectName="Supplier"/>
+		<table tableName="dasw_user" domainObjectName="User"/>
+	</context>
+</generatorConfiguration>

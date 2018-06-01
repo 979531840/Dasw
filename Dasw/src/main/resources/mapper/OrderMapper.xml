@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.OrderMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Order" >
+    <id column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="order_date" property="orderDate" jdbcType="DATE" />
+    <result column="order_totalprice" property="orderTotalprice" jdbcType="DOUBLE" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
+    <result column="order_pay" property="orderPay" jdbcType="DOUBLE" />
+  </resultMap>
+  
+  <resultMap id="OrderDetailResultMap" type="com.dasw.entity.OrderDetail" >
+    <id column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_date" property="orderDate" jdbcType="DATE" />
+    <result column="order_totalprice" property="orderTotalprice" jdbcType="DOUBLE" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
+    <result column="order_pay" property="orderPay" jdbcType="DOUBLE" />
+    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    order_id, customer_id, user_id, order_date, order_totalprice, order_status, order_flag, 
+    order_pay
+  </sql>
+  
+  
+  <select id="findAll" resultMap="OrderDetailResultMap">
+    select order_id, customer_name, user_name, order_date, order_totalprice, order_status, order_flag, order_pay
+    from dasw_user,dasw_customer,dasw_order 
+    where dasw_user.user_id = dasw_order.user_id and dasw_customer.customer_id = dasw_order.customer_id
+    order by dasw_order.order_id desc
+    
+  </select>
+  
+  <!-- <sql id="Select_Where" >
+    	<if test="orderId != null">
+    	and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+    </if>
+    <if test="customerName != '' and customerName != null">
+    	and dasw_customer.customer_name like CONCAT(CONCAT('%', #{customerName,jdbcType=VARCHAR}), '%') 
+    </if>
+    <if test="userName != '' and userName != null">
+    	and dasw_user.user_name like CONCAT(CONCAT('%', #{userName,jdbcType=VARCHAR}), '%')
+    </if>
+    <if test="orderDate != null">
+    	and dasw_order.order_date = #{orderDate,jdbcType=DATE}
+    </if>
+    <if test="orderFlag != null">
+    	and dasw_order.order_flag = #{orderFlag,jdbcType=INTEGER}
+    </if>
+  </sql>
+   -->
+   
+   <sql id="Select_Where" >
+   
+      <if test="orderId!=null and !&quot;&quot;.equals(orderId.trim())" >
+        AND  dasw_order.order_id =#{orderId,jdbcType=INTEGER}
+      </if>
+      
+      <if test="customerName!=null and !&quot;&quot;.equals(customerName.trim())" >
+        AND  dasw_customer.customer_name LIKE '%' #{customerName} '%'
+      </if>
+    
+    <if test="userName!=null and !&quot;&quot;.equals(userName.trim())" >
+        AND  dasw_user.user_name LIKE '%' #{userName} '%'
+      </if>
+ 
+ 
+ 	<if test="orderDate!=null and !&quot;&quot;.equals(orderDate.trim())" >
+        AND  dasw_order.order_date = #{orderDate,jdbcType=DATE}
+      </if>
+    
+    <if test="orderFlag!=null and !&quot;&quot;.equals(orderFlag.trim())" >
+    	and dasw_order.order_flag = #{orderFlag,jdbcType=INTEGER}
+    </if>
+  </sql>
+  
+  <select id="selectOrderByPage" resultMap="OrderDetailResultMap" parameterType="Map">
+    select order_id, customer_name, user_name, order_date, order_totalprice, order_status, order_flag, order_pay
+    from dasw_user,dasw_customer,dasw_order  
+    where dasw_user.user_id = dasw_order.user_id and dasw_customer.customer_id = dasw_order.customer_id
+     
+    <if test="orderId != null">
+    	and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+    </if>
+    <if test="customerName != '' and customerName != null">
+    	and dasw_customer.customer_name like CONCAT(CONCAT('%', #{customerName,jdbcType=VARCHAR}), '%') 
+    </if>
+    <if test="userName != '' and userName != null">
+    	and dasw_user.user_name like CONCAT(CONCAT('%', #{userName,jdbcType=VARCHAR}), '%')
+    </if>
+    <if test="orderDate != null">
+    	and dasw_order.order_date = #{orderDate,jdbcType=DATE}
+    </if>
+    <if test="orderFlag != null">
+    	and dasw_order.order_flag = #{orderFlag,jdbcType=INTEGER}
+    </if>
+    order by dasw_order.order_id desc
+    <if test="start!=null and size!=null">  
+			limit #{start},#{size}  
+     </if>
+  </select>
+  <!-- 取得记录的总数 -->  
+	<select id="selectOrderPageCount" resultType="Integer">  
+		  select count(*) from  dasw_user,dasw_customer,dasw_order
+         where dasw_user.user_id = dasw_order.user_id and dasw_customer.customer_id = dasw_order.customer_id
+    	<if test="orderId != null">
+	    	and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+	    </if>
+	    <if test="customerName != '' and customerName != null">
+	    	and dasw_customer.customer_name like CONCAT(CONCAT('%', #{customerName,jdbcType=VARCHAR}), '%') 
+	    </if>
+	    <if test="userName != '' and userName != null">
+	    	and dasw_user.user_name like CONCAT(CONCAT('%', #{userName,jdbcType=VARCHAR}), '%')
+	    </if>
+	    <if test="orderDate != null">
+	    	and dasw_order.order_date = #{orderDate,jdbcType=DATE}
+	    </if>
+	    <if test="orderFlag != null">
+	    	and dasw_order.order_flag = #{orderFlag,jdbcType=INTEGER}
+	    </if>
+	</select> 
+  
+  <select id="findById" resultMap="OrderDetailResultMap" parameterType="java.lang.Integer" >
+    select order_id, customer_name, user_name, order_date, order_totalprice, order_status, order_flag, order_pay
+    from dasw_user,dasw_customer,dasw_order
+    where dasw_user.user_id = dasw_order.user_id and dasw_customer.customer_id = dasw_order.customer_id
+    and dasw_order.order_id = #{orderId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findMax" resultType="java.lang.Integer">
+  	select MAX(order_id) from dasw_order 
+  </select>
+  
+  
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dasw_order
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dasw_order
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.dasw.entity.Order" >
+    insert into dasw_order (order_id, customer_id, user_id, 
+      order_date, order_totalprice, order_status, 
+      order_flag, order_pay)
+    values (#{orderId,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{orderDate,jdbcType=DATE}, #{orderTotalprice,jdbcType=DOUBLE}, #{orderStatus,jdbcType=INTEGER}, 
+      #{orderFlag,jdbcType=INTEGER}, #{orderPay,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dasw.entity.Order" >
+    insert into dasw_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="orderDate != null" >
+        order_date,
+      </if>
+      <if test="orderTotalprice != null" >
+        order_totalprice,
+      </if>
+      <if test="orderStatus != null" >
+        order_status,
+      </if>
+      <if test="orderFlag != null" >
+        order_flag,
+      </if>
+      <if test="orderPay != null" >
+        order_pay,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="customerId != null" >
+        #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderDate != null" >
+        #{orderDate,jdbcType=DATE},
+      </if>
+      <if test="orderTotalprice != null" >
+        #{orderTotalprice,jdbcType=DOUBLE},
+      </if>
+      <if test="orderStatus != null" >
+        #{orderStatus,jdbcType=INTEGER},
+      </if>
+      <if test="orderFlag != null" >
+        #{orderFlag,jdbcType=INTEGER},
+      </if>
+      <if test="orderPay != null" >
+        #{orderPay,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.dasw.entity.Order" >
+    update dasw_order
+    <set >
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderDate != null" >
+        order_date = #{orderDate,jdbcType=DATE},
+      </if>
+      <if test="orderTotalprice != null" >
+        order_totalprice = #{orderTotalprice,jdbcType=DOUBLE},
+      </if>
+      <if test="orderStatus != null" >
+        order_status = #{orderStatus,jdbcType=INTEGER},
+      </if>
+      <if test="orderFlag != null" >
+        order_flag = #{orderFlag,jdbcType=INTEGER},
+      </if>
+      <if test="orderPay != null" >
+        order_pay = #{orderPay,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dasw.entity.Order" >
+    update dasw_order
+    set customer_id = #{customerId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      order_date = #{orderDate,jdbcType=DATE},
+      order_totalprice = #{orderTotalprice,jdbcType=DOUBLE},
+      order_status = #{orderStatus,jdbcType=INTEGER},
+      order_flag = #{orderFlag,jdbcType=INTEGER},
+      order_pay = #{orderPay,jdbcType=DOUBLE}
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+</mapper>

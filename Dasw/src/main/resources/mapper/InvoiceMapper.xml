@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dasw.dao.InvoiceMapper" >
+  <resultMap id="BaseResultMap" type="com.dasw.entity.Invoice" >
+    <id column="invoice_id" property="invoiceId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="invoice_number" property="invoiceNumber" jdbcType="VARCHAR" />
+    <result column="invoice_owm" property="invoiceOwm" jdbcType="VARCHAR" />
+    <result column="invoice_paydate" property="invoicePaydate" jdbcType="DATE" />
+    <result column="invoice_way" property="invoiceWay" jdbcType="VARCHAR" />
+    <result column="invoice_date" property="invoiceDate" jdbcType="DATE" />
+    <result column="invoice_money" property="invoiceMoney" jdbcType="DOUBLE" />
+    <result column="invoice_flag" property="invoiceFlag" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+ <sql id="Base_Column_List" >
+    invoice_id, order_id, invoice_number, invoice_owm, invoice_paydate, invoice_way, 
+    invoice_date, invoice_money, invoice_flag
+  </sql>
+  
+  <select id="findAll" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List"/>
+  	from dasw_invoice order by invoice_id desc
+  </select>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  	select
+  	<include refid="Base_Column_List"/>
+  	from dasw_invoice
+  	where invoice_id=#{id}
+  </select>
+  
+  <insert id="addInvoice" parameterType="com.dasw.entity.Invoice">
+      insert into dasw_invoice 
+
+(order_id,invoice_number,invoice_owm,invoice_paydate,invoice_way,invoice_date,
+      invoice_money,invoice_flag)
+      values (#{orderId},#{invoiceNumber},#{invoiceOwm},str_to_date(#{invoicePaydate},'%Y-%m-%d'),#{invoiceWay},
+      str_to_date(#{invoiceDate},'%Y-%m-%d'),#{invoiceMoney},#{invoiceFlag})
+  </insert>
+  
+  <update id="editInvoice" parameterType="com.dasw.entity.Invoice">
+      update dasw_invoice
+      <set>
+              invoice_number = #{invoiceNumber},
+		      invoice_owm = #{invoiceOwm},
+		      invoice_paydate = str_to_date(#{invoicePaydate},'%Y-%m-%d'),
+		      invoice_way = #{invoiceWay},
+		      invoice_date = str_to_date(#{invoiceDate},'%Y-%m-%d'),
+		      invoice_money = #{invoiceMoney},
+		      invoice_flag = #{invoiceFlag}
+      </set>
+    where invoice_id = #{invoiceId}
+  </update>
+  
+  <delete id="deleteInvoice" parameterType="java.lang.Integer">
+      delete 
+      from dasw_invoice
+      where invoice_id=#{id}
+  </delete>
+  
+  <!-- 分页查询所有记录  返回数据集-->
+  <select id="selectInvoiceByPage" parameterType="Map" resultMap="BaseResultMap">
+  	select * from dasw_invoice i 
+  	<where>
+    <if test="invoiceNumber!=null and !&quot;&quot;.equals(invoiceNumber.trim())">
+        i.invoice_number LIKE '%' #{invoiceNumber} '%'
+     </if>
+      <if test="invoiceDate!=null and !&quot;&quot;.equals(invoiceDate.trim())" >
+        AND date_format(i.invoice_date,'%Y-%m-%d') =#{invoiceDate}
+      </if>
+      <if test="invoiceFlag!=null and !&quot;&quot;.equals(invoiceFlag.trim())" >
+        AND i.invoice_flag = #{invoiceFlag}
+      </if>
+    </where>
+    order by i.invoice_id desc
+  	<if test="start!=null and size!=null">
+  		limit #{start},#{size}
+  	</if>
+  </select>
+  
+  <!-- 分页查询  返回查询总记录数-->
+  <select id="selectInvoicePageCount"  resultType="Integer"  parameterType="com.dasw.entity.Invoice">
+  	select count(1) from dasw_invoice i
+  	<where>
+    <if test="invoiceNumber!=null and !&quot;&quot;.equals(invoiceNumber.trim())">
+        i.invoice_number LIKE '%' #{invoiceNumber} '%'
+     </if>
+      <if test="invoiceDate!=null and !&quot;&quot;.equals(invoiceDate.trim())" >
+        AND date_format(i.invoice_date,'%Y-%m-%d') =#{invoiceDate}
+      </if>
+      <if test="invoiceFlag!=null and !&quot;&quot;.equals(invoiceFlag.trim())" >
+        AND i.invoice_flag = #{invoiceFlag}
+      </if>
+      </where>
+  </select>
+</mapper>
